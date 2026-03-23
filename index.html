@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>카페 게시글 작업 가이드</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #f5f5f5; color: #333; line-height: 1.7; }
+.container { max-width: 800px; margin: 0 auto; padding: 20px; }
+h1 { text-align: center; font-size: 28px; margin: 30px 0; color: #1a1a1a; }
+h1 span { color: #4a90d9; }
+h2 { font-size: 22px; margin: 30px 0 15px; padding-bottom: 8px; border-bottom: 3px solid #4a90d9; color: #1a1a1a; }
+h3 { font-size: 18px; margin: 20px 0 10px; color: #333; }
+.subtitle { text-align: center; color: #888; margin-bottom: 40px; font-size: 14px; }
+.step { background: white; border-radius: 12px; padding: 24px; margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.step-number { display: inline-block; background: #4a90d9; color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: bold; margin-right: 10px; }
+.step-title { font-size: 18px; font-weight: bold; display: inline; }
+.step-desc { margin-top: 12px; color: #555; }
+.warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px; border-radius: 8px; margin: 16px 0; }
+.warning-icon { font-size: 20px; margin-right: 8px; }
+.danger { background: #f8d7da; border-left: 4px solid #dc3545; padding: 16px; border-radius: 8px; margin: 16px 0; }
+.success { background: #d4edda; border-left: 4px solid #28a745; padding: 16px; border-radius: 8px; margin: 16px 0; }
+.info { background: #d1ecf1; border-left: 4px solid #17a2b8; padding: 16px; border-radius: 8px; margin: 16px 0; }
+
+/* 시트 시뮬레이션 */
+.sheet-container { overflow-x: auto; margin: 16px 0; }
+.sheet { border-collapse: collapse; width: 100%; font-size: 13px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.sheet th { background: #e8e8e8; padding: 8px 12px; text-align: left; font-weight: 600; border: 1px solid #d0d0d0; white-space: nowrap; }
+.sheet td { padding: 8px 12px; border: 1px solid #e0e0e0; }
+.sheet .row-num { background: #f0f0f0; color: #888; text-align: center; width: 30px; font-size: 12px; }
+.sheet .col-a { max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+.sheet .empty { color: #ccc; }
+.sheet .name-cell { background: #fff3cd; font-weight: bold; color: #856404; }
+.sheet .link-cell { color: #0066cc; font-size: 12px; max-width: 250px; overflow: hidden; text-overflow: ellipsis; }
+.sheet .status-찜 { background: #fff3cd; color: #856404; }
+.sheet .status-완료 { background: #d4edda; color: #155724; }
+.sheet .status-에러 { background: #f8d7da; color: #721c24; }
+.sheet .k-상단 { background: #d4edda; color: #155724; font-weight: bold; }
+.sheet .k-중단 { background: #fff3cd; color: #856404; font-weight: bold; }
+.sheet .k-하단 { background: #ffeaa7; color: #856404; }
+.sheet .k-못잡음 { background: #f8d7da; color: #721c24; }
+.sheet .k-날라감 { background: #e0e0e0; color: #888; }
+
+.flow-chart { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+.flow-item { background: white; border: 2px solid #4a90d9; border-radius: 12px; padding: 12px 20px; text-align: center; font-weight: bold; }
+.flow-arrow { font-size: 24px; color: #4a90d9; }
+.flow-auto { background: #d4edda; border-color: #28a745; }
+
+.do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+.do { background: #d4edda; border-radius: 12px; padding: 20px; }
+.dont { background: #f8d7da; border-radius: 12px; padding: 20px; }
+.do h3, .dont h3 { margin-top: 0; }
+.do ul, .dont ul { padding-left: 20px; }
+.do li, .dont li { margin: 6px 0; }
+
+@media (max-width: 600px) {
+  .do-dont { grid-template-columns: 1fr; }
+  .flow-chart { flex-direction: column; }
+  .flow-arrow { transform: rotate(90deg); }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>📋 카페 게시글 <span>작업 가이드</span></h1>
+<p class="subtitle">작업시트 사용법 · 최종 업데이트 2026.03.23</p>
+
+<!-- 전체 흐름 -->
+<h2>📌 전체 작업 흐름</h2>
+
+<div class="flow-chart">
+  <div class="flow-item">① 메인시트에서<br>키워드 확인</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-item">② 내 작업시트에<br>키워드 입력 (찜)</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-item">③ 카페에<br>게시글 작성</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-item">④ 내 작업시트에<br>카페링크 입력</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-item flow-auto">⑤ 메인시트에<br>자동 반영 ✅</div>
+</div>
+
+<!-- Step 1 -->
+<h2>Step 1. 메인시트에서 키워드 확인</h2>
+
+<div class="step">
+  <div><span class="step-number">1</span><span class="step-title">메인시트 열기 (보기 전용)</span></div>
+  <div class="step-desc">
+    메인시트에서 작업할 키워드를 찾습니다.<br>
+    <strong>카페 링크(A열)가 비어있는 키워드</strong>가 작업 대상입니다.
+  </div>
+</div>
+
+<h3>메인시트 예시</h3>
+<div class="sheet-container">
+<table class="sheet">
+  <tr>
+    <th></th><th>A (카페 링크)</th><th>C (키워드)</th><th>D (월검색량)</th><th>F (키워드분류)</th><th>G (카테고리)</th><th>H (인기글순서)</th><th>K (카)</th>
+  </tr>
+  <tr>
+    <td class="row-num">2</td>
+    <td class="empty">— 비어있음 —</td>
+    <td><strong>안경점</strong></td>
+    <td>66,020</td>
+    <td>일반</td>
+    <td>안경</td>
+    <td>스마트블럭</td>
+    <td class="k-못잡음">못잡음</td>
+  </tr>
+  <tr>
+    <td class="row-num">3</td>
+    <td class="link-cell">https://cafe.naver.com/...</td>
+    <td>루테인</td>
+    <td>49,350</td>
+    <td>필수</td>
+    <td>성분</td>
+    <td>신뢰도통합</td>
+    <td class="k-상단">상단</td>
+  </tr>
+  <tr>
+    <td class="row-num">4</td>
+    <td class="empty">— 비어있음 —</td>
+    <td><strong>녹내장</strong></td>
+    <td>45,340</td>
+    <td>일반</td>
+    <td>녹내장</td>
+    <td>S블록</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="row-num">5</td>
+    <td class="name-cell">승주</td>
+    <td>루테인지아잔틴</td>
+    <td>41,310</td>
+    <td>필수</td>
+    <td>성분</td>
+    <td>스마트블럭</td>
+    <td></td>
+  </tr>
+</table>
+</div>
+
+<div class="info">
+  <strong>💡 확인 포인트</strong><br>
+  • A열이 <strong>비어있으면</strong> → 작업 가능 ✅<br>
+  • A열에 <strong>이름이 있으면</strong> → 다른 사람이 찜한 거 ❌<br>
+  • A열에 <strong>링크가 있으면</strong> → 이미 완료된 거 ❌<br>
+  • <strong>카테고리</strong>와 <strong>인기글 순서</strong>를 보고 글 작성 방향을 정합니다.
+</div>
+
+<!-- Step 2 -->
+<h2>Step 2. 내 작업시트에 키워드 입력 (찜)</h2>
+
+<div class="step">
+  <div><span class="step-number">2</span><span class="step-title">B열에 키워드 입력</span></div>
+  <div class="step-desc">
+    내 작업시트의 <strong>B열(키워드)</strong>에 작업할 키워드를 입력합니다.<br>
+    입력하는 순간 <strong>자동으로 메인시트에 내 이름이 들어갑니다.</strong> (찜 완료)
+  </div>
+</div>
+
+<h3>내 작업시트 — 키워드 입력 후</h3>
+<div class="sheet-container">
+<table class="sheet">
+  <tr>
+    <th></th><th>A (날짜)</th><th>B (키워드)</th><th>C (카페링크)</th><th>D (상태)</th><th>E (상위노출현황)</th>
+  </tr>
+  <tr>
+    <td class="row-num">2</td>
+    <td>2026-03-23</td>
+    <td><strong>안경점</strong></td>
+    <td class="empty"></td>
+    <td class="status-찜">📌 찜 완료</td>
+    <td>못잡음</td>
+  </tr>
+  <tr>
+    <td class="row-num">3</td>
+    <td>2026-03-23</td>
+    <td><strong>녹내장</strong></td>
+    <td class="empty"></td>
+    <td class="status-찜">📌 찜 완료</td>
+    <td>-</td>
+  </tr>
+</table>
+</div>
+
+<div class="success">
+  <strong>✅ 자동으로 일어나는 일</strong><br>
+  • D열: <strong>"📌 찜 완료"</strong> 자동 표시<br>
+  • E열: 메인시트의 <strong>상위 노출 현황</strong> 자동 표시<br>
+  • A열: <strong>날짜</strong> 자동 입력<br>
+  • 메인시트 A열: <strong>내 이름</strong> 자동 입력 (다른 사람이 못 가져감)
+</div>
+
+<!-- Step 3 -->
+<h2>Step 3. 카페에 게시글 작성</h2>
+
+<div class="step">
+  <div><span class="step-number">3</span><span class="step-title">네이버 카페에 글 작성</span></div>
+  <div class="step-desc">
+    메인시트에서 확인한 <strong>카테고리</strong>와 <strong>인기글 순서</strong>를 참고하여<br>
+    해당 키워드에 맞는 카페 게시글을 작성합니다.<br>
+    작성 후 <strong>게시글 URL을 복사</strong>합니다.
+  </div>
+</div>
+
+<!-- Step 4 -->
+<h2>Step 4. 카페링크 입력 → 자동 반영</h2>
+
+<div class="step">
+  <div><span class="step-number">4</span><span class="step-title">C열에 카페링크 붙여넣기</span></div>
+  <div class="step-desc">
+    내 작업시트의 <strong>C열(카페링크)</strong>에 복사한 URL을 붙여넣습니다.<br>
+    붙여넣는 순간 <strong>자동으로 메인시트에 반영됩니다.</strong>
+  </div>
+</div>
+
+<h3>내 작업시트 — 링크 입력 후</h3>
+<div class="sheet-container">
+<table class="sheet">
+  <tr>
+    <th></th><th>A (날짜)</th><th>B (키워드)</th><th>C (카페링크)</th><th>D (상태)</th><th>E (상위노출현황)</th>
+  </tr>
+  <tr>
+    <td class="row-num">2</td>
+    <td>2026-03-23</td>
+    <td>안경점</td>
+    <td class="link-cell">https://cafe.naver.com/test/12345</td>
+    <td class="status-완료">✅ 완료</td>
+    <td>다음 체크 후 반영</td>
+  </tr>
+  <tr>
+    <td class="row-num">3</td>
+    <td>2026-03-23</td>
+    <td>녹내장</td>
+    <td class="link-cell">https://cafe.naver.com/test/67890</td>
+    <td class="status-완료">✅ 완료</td>
+    <td>다음 체크 후 반영</td>
+  </tr>
+</table>
+</div>
+
+<div class="success">
+  <strong>✅ 자동으로 일어나는 일</strong><br>
+  • D열: <strong>"✅ 완료"</strong>로 변경<br>
+  • 메인시트 A열: 내 이름 → <strong>카페링크로 교체</strong><br>
+  • 상위노출현황: 다음 새벽 순위 체크 후 자동 반영
+</div>
+
+<!-- 에러 케이스 -->
+<h2>⚠️ 이런 경우가 있어요</h2>
+
+<div class="warning">
+  <span class="warning-icon">⚠️</span><strong>다른 사람이 이미 찜한 키워드</strong><br>
+  D열에 <strong>"❌ OO님이 작업 중"</strong>이 뜹니다. 다른 키워드를 선택하세요.
+</div>
+
+<div class="warning">
+  <span class="warning-icon">⚠️</span><strong>이미 링크가 있는 키워드</strong><br>
+  D열에 <strong>"❌ 이미 완료된 키워드"</strong>가 뜹니다. 다른 키워드를 선택하세요.
+</div>
+
+<div class="warning">
+  <span class="warning-icon">⚠️</span><strong>메인시트에 없는 키워드</strong><br>
+  D열에 <strong>"❌ 메인시트에 없는 키워드"</strong>가 뜹니다. 키워드를 정확하게 입력했는지 확인하세요.
+</div>
+
+<!-- 상위 노출 현황 -->
+<h2>📊 상위 노출 현황 보는 법</h2>
+
+<div class="step">
+  <div class="step-desc">
+    E열에 표시되는 상위 노출 현황은 <strong>매일 새벽 자동으로 업데이트</strong>됩니다.<br>
+    내가 작성한 카페글이 네이버 검색에서 어디에 위치하는지 보여줍니다.
+  </div>
+</div>
+
+<div class="sheet-container">
+<table class="sheet">
+  <tr><th>값</th><th>의미</th><th>색상</th></tr>
+  <tr><td class="k-상단"><strong>상단</strong></td><td>검색 결과 1~5위 (최고!)</td><td style="background:#d4edda">🟢 초록</td></tr>
+  <tr><td class="k-중단"><strong>중단</strong></td><td>검색 결과 6~10위 (괜찮음)</td><td style="background:#fff3cd">🟡 노랑</td></tr>
+  <tr><td class="k-하단"><strong>하단</strong></td><td>검색 결과 11위 이하 (개선 필요)</td><td style="background:#ffeaa7">🟠 주황</td></tr>
+  <tr><td class="k-못잡음"><strong>못잡음</strong></td><td>검색 결과에 안 보임</td><td style="background:#f8d7da">🔴 빨강</td></tr>
+  <tr><td class="k-날라감"><strong>날라감</strong></td><td>게시글이 삭제됨</td><td style="background:#e0e0e0">⚪ 회색</td></tr>
+  <tr><td>다음 체크 후 반영</td><td>오늘 작성한 글, 내일 확인됨</td><td>-</td></tr>
+</table>
+</div>
+
+<!-- DO / DON'T -->
+<h2>✅ 지켜야 할 것 / ❌ 하면 안 되는 것</h2>
+
+<div class="do-dont">
+  <div class="do">
+    <h3>✅ DO</h3>
+    <ul>
+      <li><strong>내 작업시트에서만</strong> 작업하기</li>
+      <li>키워드를 <strong>정확하게</strong> 입력하기</li>
+      <li>카페링크는 <strong>전체 URL</strong> 붙여넣기</li>
+      <li>메인시트에서 카테고리/인기글순서 <strong>확인</strong>하기</li>
+      <li>작업 전 <strong>A열 확인</strong> (빈 것만 작업)</li>
+    </ul>
+  </div>
+  <div class="dont">
+    <h3>❌ DON'T</h3>
+    <ul>
+      <li><strong>메인시트 직접 편집</strong> ← 절대 금지!</li>
+      <li>다른 사람이 <strong>찜한 키워드</strong> 작업하기</li>
+      <li>같은 키워드 <strong>중복</strong> 작업하기</li>
+      <li>카페링크 대신 <strong>다른 내용</strong> 넣기</li>
+      <li>메인시트 <strong>행/열 드래그</strong>하기</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FAQ -->
+<h2>❓ 자주 묻는 질문</h2>
+
+<div class="step">
+  <div><span class="step-title">Q. 찜한 키워드를 취소하고 싶어요</span></div>
+  <div class="step-desc">작업시트에서 해당 행의 키워드를 지우면 됩니다. 메인시트의 이름도 자동으로 사라집니다.</div>
+</div>
+
+<div class="step">
+  <div><span class="step-title">Q. 상위노출현황이 "다음 체크 후 반영"이에요</span></div>
+  <div class="step-desc">오늘 작성한 글은 내일 새벽 순위 체크 후 결과가 나옵니다. 하루 기다려주세요.</div>
+</div>
+
+<div class="step">
+  <div><span class="step-title">Q. 메인시트에서 필터를 걸고 싶어요</span></div>
+  <div class="step-desc"><strong>데이터 → 필터 뷰 → 임시 필터 뷰 만들기</strong>를 사용하세요. 다른 사람에게 영향 없이 필터를 걸 수 있습니다.</div>
+</div>
+
+<div class="danger">
+  <strong>🚨 중요!</strong><br>
+  문제가 생기면 <strong>메인시트를 절대 건드리지 말고</strong> 담당자에게 연락하세요.
+</div>
+
+<p style="text-align:center; color:#aaa; margin-top:40px; font-size:12px;">
+  루멘큐브랩 · 카페 게시글 작업 가이드 · 2026.03.23
+</p>
+
+</div>
+</body>
+</html>
